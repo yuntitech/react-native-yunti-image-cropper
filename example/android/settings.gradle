@@ -1,0 +1,5 @@
+rootProject.name = 'example'
+include ':react-native-yunti-image-cropper'
+project(':react-native-yunti-image-cropper').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-yunti-image-cropper/android')
+
+include ':app'
