@@ -1,49 +1,82 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
-import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
-
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+// @flow
+import React, { Component } from 'react';
+import {
+  StyleSheet,
+  SafeAreaView,
+  View,
+  NativeModules,
+  Text,
+  Image,
+  TouchableOpacity
+} from 'react-native';
 
 type Props = {};
-export default class App extends Component<Props> {
+
+type State = {
+  uri: ?string
+};
+
+export default class App extends Component<Props, State> {
+  imageView: ?Image;
+  state = {};
+  onPress = async () => {
+    const { RNYuntiImageCropper } = NativeModules;
+    const { uri } = Image.resolveAssetSource(require('./demo.png'));
+    try {
+      const data = await RNYuntiImageCropper.cropWithUri(uri);
+      this.setState({ uri: data.uri });
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   render() {
+    const { uri } = this.state;
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
-      </View>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.imageContainer}>
+          <Image
+            style={styles.image}
+            resizeMode={'contain'}
+            source={require('./demo.png')}
+            ref={ref => (this.imageView = ref)}
+          />
+          {uri ? (
+            <Image
+              style={styles.image}
+              resizeMode={'contain'}
+              source={{ uri }}
+            />
+          ) : (
+            <View style={styles.image} />
+          )}
+        </View>
+
+        <TouchableOpacity style={styles.button} onPress={this.onPress}>
+          <Text style={{ color: 'white' }}>截图</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1
+  },
+  imageContainer: {
+    height: '90%',
+    flexDirection: 'row'
+  },
+  image: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    height: '100%'
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+  button: {
+    alignSelf: 'center',
+    padding: 10,
+    backgroundColor: '#63B8FF',
+    borderRadius: 3
+  }
 });
