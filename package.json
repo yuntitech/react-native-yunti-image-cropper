@@ -9,8 +9,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/github_account/react-native-yunti-image-cropper.git",
-    "baseUrl": "https://github.com/github_account/react-native-yunti-image-cropper"
+    "url": "git+https://git.bookln.cn/yuntitech_react_native/react-native-yunti-image-cropper.git",
+    "baseUrl": "https://git.bookln.cn/yuntitech_react_native/react-native-yunti-image-cropper"
   },
   "keywords": [
     "react-native"
