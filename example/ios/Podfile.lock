@@ -1,0 +1,71 @@
+PODS:
+  - React/Core (0.57.3):
+    - yoga (= 0.57.3.React)
+  - React/fishhook (0.57.3)
+  - React/RCTActionSheet (0.57.3):
+    - React/Core
+  - React/RCTAnimation (0.57.3):
+    - React/Core
+  - React/RCTBlob (0.57.3):
+    - React/Core
+  - React/RCTGeolocation (0.57.3):
+    - React/Core
+  - React/RCTImage (0.57.3):
+    - React/Core
+    - React/RCTNetwork
+  - React/RCTLinkingIOS (0.57.3):
+    - React/Core
+  - React/RCTNetwork (0.57.3):
+    - React/Core
+  - React/RCTSettings (0.57.3):
+    - React/Core
+  - React/RCTText (0.57.3):
+    - React/Core
+  - React/RCTVibration (0.57.3):
+    - React/Core
+  - React/RCTWebSocket (0.57.3):
+    - React/Core
+    - React/fishhook
+    - React/RCTBlob
+  - RNYuntiImageCropper (1.0.0):
+    - React/Core
+    - TOCropViewController
+  - TOCropViewController (2.3.8)
+  - yoga (0.57.3.React)
+
+DEPENDENCIES:
+  - React/Core (from `../node_modules/react-native`)
+  - React/RCTActionSheet (from `../node_modules/react-native`)
+  - React/RCTAnimation (from `../node_modules/react-native`)
+  - React/RCTGeolocation (from `../node_modules/react-native`)
+  - React/RCTImage (from `../node_modules/react-native`)
+  - React/RCTLinkingIOS (from `../node_modules/react-native`)
+  - React/RCTNetwork (from `../node_modules/react-native`)
+  - React/RCTSettings (from `../node_modules/react-native`)
+  - React/RCTText (from `../node_modules/react-native`)
+  - React/RCTVibration (from `../node_modules/react-native`)
+  - React/RCTWebSocket (from `../node_modules/react-native`)
+  - RNYuntiImageCropper (from `../..`)
+  - yoga (from `../node_modules/react-native/ReactCommon/yoga/yoga.podspec`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - TOCropViewController
+
+EXTERNAL SOURCES:
+  React:
+    :path: "../node_modules/react-native"
+  RNYuntiImageCropper:
+    :path: "../.."
+  yoga:
+    :path: "../node_modules/react-native/ReactCommon/yoga/yoga.podspec"
+
+SPEC CHECKSUMS:
+  React: 1fe0eb13d90b625d94c3b117c274dcfd2e760e11
+  RNYuntiImageCropper: 36e65c8389b58746e616636aa563b3b1be759218
+  TOCropViewController: 0a075f02c253e88095143bbac7b013fc6fba5090
+  yoga: b1ce48b6cf950b98deae82838f5173ea7cf89e85
+
+PODFILE CHECKSUM: e31652ba31c960b22c47aa7900821c715e2250ed
+
+COCOAPODS: 1.5.3
