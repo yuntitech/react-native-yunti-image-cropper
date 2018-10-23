@@ -38,11 +38,10 @@ RCT_EXPORT_METHOD(cropWithUri:(NSString *)imageUrl
 }
 
 - (void)handleImageLoad:(UIImage *)image {
-    UIViewController *root = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
     TOCropViewController *cropViewController = [[TOCropViewController alloc] initWithImage:image];
     cropViewController.delegate = self;
-    
     dispatch_async(dispatch_get_main_queue(), ^{
+        UIViewController *root = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
         [root presentViewController:cropViewController animated:YES completion:nil];
     });
 }
