@@ -33,15 +33,6 @@
       compile project(':react-native-yunti-image-cropper')
   	```
 
-#### Windows
-[Read it! :D](https://github.com/ReactWindows/react-native)
-
-1. In Visual Studio add the `RNYuntiImageCropper.sln` in `node_modules/react-native-yunti-image-cropper/windows/RNYuntiImageCropper.sln` folder to their solution, reference from their app.
-2. Open up your `MainPage.cs` app
-  - Add `using Yunti.Image.Cropper.RNYuntiImageCropper;` to the usings at the top of the file
-  - Add `new RNYuntiImageCropperPackage()` to the `List<IReactPackage>` returned by the `Packages` method
-
-
 ## Usage
 ```javascript
 import RNYuntiImageCropper from 'react-native-yunti-image-cropper';
