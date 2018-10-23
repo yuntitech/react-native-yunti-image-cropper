@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#000000">
+
+    <com.theartofdev.edmodo.cropper.CropImageView
+        android:id="@+id/cropImageView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_gravity="center"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
+        <ImageView
+            android:id="@+id/btn_close_cropper"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/btn_cropper_cancel"/>
+
+        <ImageView
+            android:id="@+id/btn_start_cropper"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="100dp"
+            android:layout_toRightOf="@id/btn_close_cropper"
+            android:src="@drawable/btn_cropper_confirm"/>
+    </RelativeLayout>
+
+</LinearLayout>

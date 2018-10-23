@@ -1,6 +1,9 @@
 buildscript {
     repositories {
         jcenter()
+        maven {
+            url 'https://maven.google.com'
+        }
     }
 
     dependencies {
@@ -31,6 +34,7 @@ android {
     targetSdkVersion safeExtGet('targetSdkVersion', DEFAULT_TARGET_SDK_VERSION)
     versionCode 1
     versionName "1.0"
+    consumerProguardFiles 'lib-proguard-rules.txt'
   }
   lintOptions {
     abortOnError false
@@ -45,10 +49,15 @@ repositories {
         url "$projectDir/../node_modules/react-native/android"
     }
     mavenCentral()
+    maven {
+        url 'https://maven.google.com'
+    }
+    jcenter()
 }
 
 dependencies {
     compile 'com.facebook.react:react-native:+'
+    compile 'com.theartofdev.edmodo:android-image-cropper:2.7.+'
 }
 
 def configureReactNativePom(def pom) {
