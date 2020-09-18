@@ -17,4 +17,4 @@ class ImageCropperUtil {
   };
 }
 
-const imageCropperUtil = new ImageCropperUtil();
+export const imageCropperUtil = new ImageCropperUtil();
