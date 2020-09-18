@@ -8,11 +8,11 @@ class ImageCropperUtil {
   public cropWithUriWithAspectRatio = async (
     uri: string,
     param: { aspectRatioX: number; aspectRatioY: number }
-  ): Promise<string> => {
+  ): Promise<{ uri: string }> => {
     return RNYuntiImageCropper.cropWithUriWithAspectRatio(uri, param);
   };
 
-  public cropWithUri = async (uri: string): Promise<string> => {
+  public cropWithUri = async (uri: string): Promise<{ uri: string }> => {
     return RNYuntiImageCropper.cropWithUri(uri);
   };
 }
