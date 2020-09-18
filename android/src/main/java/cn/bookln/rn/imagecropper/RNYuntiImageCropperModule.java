@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Promise;
@@ -17,6 +16,8 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageOptions;
+
+import androidx.annotation.NonNull;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -45,7 +46,7 @@ public class RNYuntiImageCropperModule extends ReactContextBaseJavaModule implem
 
     @ReactMethod
     public void cropWithUri(final String uriStr, final Promise promise) {
-        cropWithUri(uriStr, null, promise);
+        cropWithUriWithAspectRatio(uriStr, null, promise);
     }
 
     /**
@@ -55,12 +56,18 @@ public class RNYuntiImageCropperModule extends ReactContextBaseJavaModule implem
      * @param options
      * @param promise
      */
-    public void cropWithUri(final String uriStr, final ReadableMap options, final Promise promise) {
+    @ReactMethod
+    public void cropWithUriWithAspectRatio(final String uriStr, final ReadableMap options, final Promise promise) {
         final Activity activity = getCurrentActivity();
 
         if (activity == null) {
             promise.reject("400", "Activity doesn't exist");
             return;
+        }
+
+        if(options!=null){
+            mOptions.aspectRatioX= options.getInt("aspectRatioX");
+            mOptions.aspectRatioY=options.getInt("aspectRatioY");
         }
 
         mPromise = promise;

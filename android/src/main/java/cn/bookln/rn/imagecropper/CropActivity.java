@@ -8,8 +8,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -20,6 +18,9 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 import java.io.IOException;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 
 public class CropActivity extends AppCompatActivity implements CropImageView.OnSetImageUriCompleteListener,
@@ -74,6 +75,7 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
                 mCropImageView.setImageUriAsync(mCropImageUri);
             }
         }
+
     }
 
     @Override
@@ -154,6 +156,10 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
             }
             if (mOptions.initialRotation > -1) {
                 mCropImageView.setRotatedDegrees(mOptions.initialRotation);
+            }
+            if (mOptions.aspectRatioY > 1 && mOptions.aspectRatioX > 1) {
+                mCropImageView.setAspectRatio(mOptions.aspectRatioX,mOptions.aspectRatioY);
+                mCropImageView.setFixedAspectRatio(false);
             }
         } else {
             setResult(null, error, 1);
