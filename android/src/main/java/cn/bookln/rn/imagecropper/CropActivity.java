@@ -6,8 +6,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -158,8 +160,11 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
                 mCropImageView.setRotatedDegrees(mOptions.initialRotation);
             }
             if (mOptions.aspectRatioY > 1 && mOptions.aspectRatioX > 1) {
-                mCropImageView.setAspectRatio(mOptions.aspectRatioX,mOptions.aspectRatioY);
-                mCropImageView.setFixedAspectRatio(false);
+                Rect cropRect = mCropImageView.getCropRect();
+                int width = cropRect.right - cropRect.left;
+                float aspect = mOptions.aspectRatioX * 1f / mOptions.aspectRatioY;
+                int newHeight = (int) (width / aspect);
+                mCropImageView.setCropRect(new Rect(cropRect.left, cropRect.top, cropRect.right, cropRect.top + newHeight));
             }
         } else {
             setResult(null, error, 1);

@@ -3,6 +3,7 @@ package cn.bookln.rn.imagecropper;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -52,7 +53,7 @@ public class RNYuntiImageCropperModule extends ReactContextBaseJavaModule implem
     /**
      * 以Uri打开截图
      *
-     * @param uriStr 必须是本地Uri
+     * @param uriStr  必须是本地Uri
      * @param options
      * @param promise
      */
@@ -65,17 +66,22 @@ public class RNYuntiImageCropperModule extends ReactContextBaseJavaModule implem
             return;
         }
 
-        if(options!=null){
-            mOptions.aspectRatioX= options.getInt("aspectRatioX");
-            mOptions.aspectRatioY=options.getInt("aspectRatioY");
+        if (options != null) {
+            mOptions.aspectRatioX = options.getInt("aspectRatioX");
+            mOptions.aspectRatioY = options.getInt("aspectRatioY");
+            mOptions.initialCropWindowPaddingRatio = 0.05f;
         }
 
         mPromise = promise;
 //        setConfiguration(options);
-
 //        mSource = Uri.parse("file:///storage/emulated/0/DCIM/Camera/IMG_20181012_154422.jpg");
         mSource = Uri.parse(uriStr);
         activity.startActivityForResult(getIntent(activity), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+    }
+
+    public static int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
     }
 
     public Intent getIntent(@NonNull Context context) {
