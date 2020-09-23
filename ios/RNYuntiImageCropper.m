@@ -30,15 +30,49 @@ RCT_EXPORT_METHOD(cropWithUri:(NSString *)imageUrl
     self._resolve = resolve;
     NSURLRequest *imageUrlrequest = [NSURLRequest requestWithURL:[NSURL URLWithString:imageUrl]];
     [self.bridge.imageLoader loadImageWithURLRequest:imageUrlrequest callback:^(NSError *error, UIImage *image) {
-        if(error) reject(@"500", @"加载图片失败", error);
-        if(image) {
-            [self handleImageLoad:image];
+        if (error) {
+            reject(@"500", @"加载图片失败", error);
+            return;
+        }
+        if (image) {
+            [self handleImageLoad:image aspectRatio:CGSizeZero];
         }
     }];
 }
 
-- (void)handleImageLoad:(UIImage *)image {
+RCT_EXPORT_METHOD(cropWithUriWithAspectRatio:(NSString *)imageUrl
+                  params:(NSDictionary *)params
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    if (!imageUrl) {
+        reject(@"500", @"文件路径为空", [NSError errorWithDomain:@"文件路径为空" code:500 userInfo:NULL]);
+        return;
+    }
+    
+    self._reject = reject;
+    self._resolve = resolve;
+    NSURLRequest *imageUrlrequest = [NSURLRequest requestWithURL:[NSURL URLWithString:imageUrl]];
+    [self.bridge.imageLoader loadImageWithURLRequest:imageUrlrequest callback:^(NSError *error, UIImage *image) {
+        if (error) {
+            reject(@"500", @"加载图片失败", error);
+            return;
+        }
+        if (image) {
+            NSNumber *width = [params valueForKey:@"aspectRatioX"];
+            NSNumber *height = [params valueForKey:@"aspectRatioY"];
+            CGSize ratio = CGSizeMake(width.doubleValue, height.doubleValue);
+            [self handleImageLoad:image aspectRatio:ratio];
+        }
+    }];
+}
+
+- (void)handleImageLoad:(UIImage *)image aspectRatio:(CGSize)aspectRatio {
     TOCropViewController *cropViewController = [[TOCropViewController alloc] initWithImage:image];
+    
+    if (!CGSizeEqualToSize(CGSizeZero, aspectRatio)) {
+        cropViewController.customAspectRatio = aspectRatio;
+    }
+    
     cropViewController.delegate = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         UIViewController *root = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
