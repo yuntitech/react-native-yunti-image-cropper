@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -162,9 +161,13 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
             if (mOptions.aspectRatioY > 1 && mOptions.aspectRatioX > 1) {
                 Rect cropRect = mCropImageView.getCropRect();
                 int width = cropRect.right - cropRect.left;
+                int height = cropRect.bottom - cropRect.top;
+                int halfHeight = height / 2;
+                int centerY = cropRect.top + halfHeight;
                 float aspect = mOptions.aspectRatioX * 1f / mOptions.aspectRatioY;
                 int newHeight = (int) (width / aspect);
-                mCropImageView.setCropRect(new Rect(cropRect.left, cropRect.top, cropRect.right, cropRect.top + newHeight));
+
+                mCropImageView.setCropRect(new Rect(cropRect.left, centerY - newHeight / 2, cropRect.right, centerY + newHeight / 2));
             }
         } else {
             setResult(null, error, 1);
