@@ -1,7 +1,7 @@
 {
   "name": "react-native-yunti-image-cropper",
   "title": "React Native Yunti Image Cropper",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "RN图片剪裁模块",
   "main": "index.ts",
   "scripts": {
