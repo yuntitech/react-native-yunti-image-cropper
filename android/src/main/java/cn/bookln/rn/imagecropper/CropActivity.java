@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -29,13 +31,19 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
 
     private CropImageView mCropImageView;
 
-    private ImageView IvStartCropper;
+    private TextView IvStartCropper;
 
-    private ImageView IvCloseCropper;
+    private RelativeLayout IvCloseCropper;
+
+    private ImageView ivRotateLeft;
+
+    private ImageView ivRotateRight;
 
     private Uri mCropImageUri;
 
     private CropImageOptions mOptions;
+
+    private int rotateDegree = 0;
 
     @Override
     @SuppressLint("NewApi")
@@ -45,6 +53,25 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
         mCropImageView = findViewById(R.id.cropImageView);
         IvStartCropper = findViewById(R.id.btn_start_cropper);
         IvCloseCropper = findViewById(R.id.btn_close_cropper);
+
+        ivRotateLeft = findViewById(R.id.btn_rotate_left);
+        ivRotateRight = findViewById(R.id.btn_rotate_right);
+
+        ivRotateLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rotateDegree -= 90;
+                mCropImageView.setRotatedDegrees(rotateDegree);
+            }
+        });
+
+        ivRotateRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rotateDegree += 90;
+                mCropImageView.setRotatedDegrees(rotateDegree);
+            }
+        });
 
         IvCloseCropper.setOnClickListener(new View.OnClickListener() {
             @Override

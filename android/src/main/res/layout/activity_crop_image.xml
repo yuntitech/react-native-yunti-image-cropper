@@ -1,36 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="#000000">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#000000" android:orientation="vertical">
 
-    <com.theartofdev.edmodo.cropper.CropImageView
-        android:id="@+id/cropImageView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_gravity="center"/>
+    <com.theartofdev.edmodo.cropper.CropImageView android:id="@+id/cropImageView" android:layout_width="match_parent" android:layout_height="0dp" android:layout_gravity="center" android:layout_weight="1" />
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp">
-        <ImageView
-            android:id="@+id/btn_close_cropper"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:src="@drawable/btn_cropper_cancel"/>
+    <RelativeLayout android:layout_width="wrap_content" android:layout_height="70dp">
 
-        <ImageView
-            android:id="@+id/btn_start_cropper"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_marginLeft="100dp"
-            android:layout_toRightOf="@id/btn_close_cropper"
-            android:src="@drawable/btn_cropper_confirm"/>
+        <RelativeLayout android:id="@+id/btn_close_cropper" android:layout_width="40dp" android:layout_height="40dp" android:layout_centerVertical="true" android:layout_marginLeft="15dp">
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true" android:text="取消" android:textColor="#FFFFFF" />
+        </RelativeLayout>
+
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true" android:layout_centerVertical="true">
+
+            <ImageView android:id="@+id/btn_rotate_left" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/ic_rotate_left" />
+
+            <ImageView android:id="@+id/btn_rotate_right" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="50dp" android:background="@drawable/ic_rotate_right" />
+        </LinearLayout>
+
+
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:layout_centerVertical="true" android:gravity="center">
+
+            <TextView android:id="@+id/btn_start_cropper" android:layout_width="74dp" android:layout_height="32dp" android:layout_marginRight="20dp" android:background="@drawable/btn_sure" android:gravity="center" android:text="完成" android:textColor="#FFFFFF" />
+        </LinearLayout>
     </RelativeLayout>
 
 </LinearLayout>
