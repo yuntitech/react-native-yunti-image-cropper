@@ -18,3 +18,5 @@ class ImageCropperUtil {
 }
 
 export const imageCropperUtil = new ImageCropperUtil();
+
+export const cropPercentDataKey = "cropPercentData";

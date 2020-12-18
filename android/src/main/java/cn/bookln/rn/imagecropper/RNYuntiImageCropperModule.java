@@ -3,7 +3,6 @@ package cn.bookln.rn.imagecropper;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -12,8 +11,10 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageOptions;
@@ -107,9 +108,19 @@ public class RNYuntiImageCropperModule extends ReactContextBaseJavaModule implem
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
         if (requestCode == CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
             if (resultCode == RESULT_OK) {
+
                 Uri resultUri = result.getUri();
                 WritableMap writableMap = new WritableNativeMap();
+                float[] cropPercentData = data.getFloatArrayExtra(CropActivity.CROP_PERCENT_DATA);
+                if (data != null && cropPercentData != null) {
+                    WritableNativeArray writableNativeArray = new WritableNativeArray();
+                    for (float cropPercentDatum : cropPercentData) {
+                        writableNativeArray.pushDouble(cropPercentDatum);
+                    }
+                    writableMap.putArray(CropActivity.CROP_PERCENT_DATA, writableNativeArray);
+                }
                 writableMap.putString("uri", resultUri.toString());
                 mPromise.resolve(writableMap);
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {

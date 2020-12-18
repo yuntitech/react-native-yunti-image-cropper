@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -44,6 +45,8 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
     private CropImageOptions mOptions;
 
     private int rotateDegree = 0;
+
+    public static String CROP_PERCENT_DATA = "cropPercentData";
 
     @Override
     @SuppressLint("NewApi")
@@ -173,7 +176,26 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
 
     @Override
     public void onCropImageComplete(CropImageView view, CropImageView.CropResult result) {
-        setResult(result.getUri(), result.getError(), result.getSampleSize());
+
+        Rect cropRect = result.getCropRect();
+        int cropLeft = cropRect.left;
+        int cropRight = cropRect.right;
+        int cropTop = cropRect.top;
+        int cropBottom = cropRect.bottom;
+
+        Rect wholeImageRect = result.getWholeImageRect();
+        int wholeLeft = wholeImageRect.left;
+        int wholeRight = wholeImageRect.right;
+        int wholeTop = wholeImageRect.top;
+        int wholeBottom = wholeImageRect.bottom;
+
+        float leftPercent = cropLeft * 1f / (wholeRight - wholeLeft);
+        float rightPercent = cropRight * 1f / (wholeRight - wholeLeft);
+
+        float topPercent = cropTop * 1f / (wholeBottom - wholeTop);
+        float bottomPercent = cropBottom * 1f / (wholeBottom - wholeTop);
+        float[] cropPercent = {leftPercent, topPercent, rightPercent, bottomPercent};
+        setResult(result.getUri(), result.getError(), result.getSampleSize(),cropPercent);
     }
 
     @Override
@@ -197,13 +219,13 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
                 mCropImageView.setCropRect(new Rect(cropRect.left, centerY - newHeight / 2, cropRect.right, centerY + newHeight / 2));
             }
         } else {
-            setResult(null, error, 1);
+            setResult(null, error, 1,null);
         }
     }
 
     protected void cropImage() {
         if (mOptions.noOutputImage) {
-            setResult(null, null, 1);
+            setResult(null, null, 1,null);
         } else {
             Uri outputUri = getOutputUri();
             mCropImageView.saveCroppedImageAsync(
@@ -239,9 +261,9 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
     /**
      * Result with cropped image data or error if failed.
      */
-    protected void setResult(Uri uri, Exception error, int sampleSize) {
+    protected void setResult(Uri uri, Exception error, int sampleSize, float[] cropData) {
         int resultCode = error == null ? RESULT_OK : CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE;
-        setResult(resultCode, getResultIntent(uri, error, sampleSize));
+        setResult(resultCode, getResultIntent(uri, error, sampleSize, cropData));
         finish();
     }
 
@@ -256,7 +278,7 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
     /**
      * Get intent instance to be used for the result of this activity.
      */
-    protected Intent getResultIntent(Uri uri, Exception error, int sampleSize) {
+    protected Intent getResultIntent(Uri uri, Exception error, int sampleSize, float[] cropData) {
         CropImage.ActivityResult result =
                 new CropImage.ActivityResult(
                         mCropImageView.getImageUri(),
@@ -270,6 +292,7 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
         Intent intent = new Intent();
         intent.putExtras(getIntent());
         intent.putExtra(CropImage.CROP_IMAGE_EXTRA_RESULT, result);
+        intent.putExtra(CropActivity.CROP_PERCENT_DATA, cropData);
         return intent;
     }
 }
