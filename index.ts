@@ -7,7 +7,7 @@ export default RNYuntiImageCropper;
 /**
  * left,right,top,bottom表示裁剪之后的图片占原图坐标值，大小为0～1
  */
-export interface CropCoordsPercent {
+export interface CroppedCoordsPercent {
   left: number;
   right: number;
   top: number;
@@ -20,7 +20,7 @@ class ImageCropperUtil {
     param: { aspectRatioX: number; aspectRatioY: number }
   ): Promise<{
     uri: string;
-    croppedCoordsPercent?: CropCoordsPercent;
+    croppedCoordsPercent?: CroppedCoordsPercent;
     croppedWidth?: number;
     croppedHeight?: number;
   }> => {
@@ -31,7 +31,7 @@ class ImageCropperUtil {
     uri: string
   ): Promise<{
     uri: string;
-    croppedCoordsPercent?: CropCoordsPercent;
+    croppedCoordsPercent?: CroppedCoordsPercent;
     croppedWidth?: number;
     croppedHeight?: number;
   }> => {
