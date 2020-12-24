@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -46,7 +45,9 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
 
     private int rotateDegree = 0;
 
-    public static String CROP_PERCENT_DATA = "cropPercentData";
+    public static String CROP_PERCENT_DATA = "croppedCoordsPercent";
+    public static String CROPPED_WIDTH = "croppedWidth";
+    public static String CROPPED_HEIGHT = "croppedHeight";
 
     @Override
     @SuppressLint("NewApi")
@@ -182,7 +183,6 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
         int cropRight = cropRect.right;
         int cropTop = cropRect.top;
         int cropBottom = cropRect.bottom;
-
         Rect wholeImageRect = result.getWholeImageRect();
         int wholeLeft = wholeImageRect.left;
         int wholeRight = wholeImageRect.right;
@@ -195,7 +195,10 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
         float topPercent = cropTop * 1f / (wholeBottom - wholeTop);
         float bottomPercent = cropBottom * 1f / (wholeBottom - wholeTop);
         float[] cropPercent = {leftPercent, topPercent, rightPercent, bottomPercent};
-        setResult(result.getUri(), result.getError(), result.getSampleSize(),cropPercent);
+
+        int cropWidth =cropRight-cropLeft;
+        int cropHeight =cropBottom-cropTop;
+        setResult(result.getUri(), result.getError(), result.getSampleSize(),cropPercent,cropWidth,cropHeight);
     }
 
     @Override
@@ -219,13 +222,13 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
                 mCropImageView.setCropRect(new Rect(cropRect.left, centerY - newHeight / 2, cropRect.right, centerY + newHeight / 2));
             }
         } else {
-            setResult(null, error, 1,null);
+            setResult(null, error, 1,null,0,0);
         }
     }
 
     protected void cropImage() {
         if (mOptions.noOutputImage) {
-            setResult(null, null, 1,null);
+            setResult(null, null, 1,null,0,0);
         } else {
             Uri outputUri = getOutputUri();
             mCropImageView.saveCroppedImageAsync(
@@ -261,9 +264,9 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
     /**
      * Result with cropped image data or error if failed.
      */
-    protected void setResult(Uri uri, Exception error, int sampleSize, float[] cropData) {
+    protected void setResult(Uri uri, Exception error, int sampleSize, float[] cropData,int cropWidth,int cropHeight) {
         int resultCode = error == null ? RESULT_OK : CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE;
-        setResult(resultCode, getResultIntent(uri, error, sampleSize, cropData));
+        setResult(resultCode, getResultIntent(uri, error, sampleSize, cropData,cropWidth,cropHeight));
         finish();
     }
 
@@ -278,7 +281,7 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
     /**
      * Get intent instance to be used for the result of this activity.
      */
-    protected Intent getResultIntent(Uri uri, Exception error, int sampleSize, float[] cropData) {
+    protected Intent getResultIntent(Uri uri, Exception error, int sampleSize, float[] cropData,int cropWidth,int cropHeight) {
         CropImage.ActivityResult result =
                 new CropImage.ActivityResult(
                         mCropImageView.getImageUri(),
@@ -293,6 +296,8 @@ public class CropActivity extends AppCompatActivity implements CropImageView.OnS
         intent.putExtras(getIntent());
         intent.putExtra(CropImage.CROP_IMAGE_EXTRA_RESULT, result);
         intent.putExtra(CropActivity.CROP_PERCENT_DATA, cropData);
+        intent.putExtra(CropActivity.CROPPED_HEIGHT, cropHeight);
+        intent.putExtra(CropActivity.CROPPED_WIDTH, cropWidth);
         return intent;
     }
 }

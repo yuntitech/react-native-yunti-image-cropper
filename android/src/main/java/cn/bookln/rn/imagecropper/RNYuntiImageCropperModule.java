@@ -115,12 +115,18 @@ public class RNYuntiImageCropperModule extends ReactContextBaseJavaModule implem
                 WritableMap writableMap = new WritableNativeMap();
                 float[] cropPercentData = data.getFloatArrayExtra(CropActivity.CROP_PERCENT_DATA);
                 if (data != null && cropPercentData != null) {
-                    WritableNativeArray writableNativeArray = new WritableNativeArray();
-                    for (float cropPercentDatum : cropPercentData) {
-                        writableNativeArray.pushDouble(cropPercentDatum);
-                    }
-                    writableMap.putArray(CropActivity.CROP_PERCENT_DATA, writableNativeArray);
+                    WritableMap coordsMap = new WritableNativeMap();
+                    coordsMap.putDouble("left",cropPercentData[0]);
+                    coordsMap.putDouble("top",cropPercentData[1]);
+                    coordsMap.putDouble("right",cropPercentData[2]);
+                    coordsMap.putDouble("bottom",cropPercentData[3]);
+                    writableMap.putMap(CropActivity.CROP_PERCENT_DATA,coordsMap);
                 }
+                int cropWidth = data.getIntExtra(CropActivity.CROPPED_WIDTH, 0);
+                int cropHeight = data.getIntExtra(CropActivity.CROPPED_HEIGHT, 0);
+                writableMap.putInt(CropActivity.CROPPED_WIDTH,cropWidth);
+                writableMap.putInt(CropActivity.CROPPED_HEIGHT,cropHeight);
+
                 writableMap.putString("uri", resultUri.toString());
                 mPromise.resolve(writableMap);
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
