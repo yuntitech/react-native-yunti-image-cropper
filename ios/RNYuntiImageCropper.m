@@ -91,16 +91,25 @@ RCT_EXPORT_METHOD(cropWithUriWithAspectRatio:(NSString *)imageUrl
   });
   
   NSData *pngData = UIImagePNGRepresentation(image);
-  NSString *fileName = [NSString stringWithFormat:@"yunti-rn-crop-%lf.png", [NSDate timeIntervalSinceReferenceDate]];
+  NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
+  NSString *fileName = [NSString stringWithFormat:@"yunti-rn-crop-%lf.png", now];
   NSString *filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
   [pngData writeToFile:filePath atomically:YES];
   NSNumber *width  = [NSNumber numberWithFloat:image.size.width];
   NSNumber *height = [NSNumber numberWithFloat:image.size.height];
   
-  CGFloat left = cropRect.origin.x / self.originalImage.size.width;
-  CGFloat right = (cropRect.origin.x + cropRect.size.width) / self.originalImage.size.width;
-  CGFloat top = cropRect.origin.y / self.originalImage.size.height;
-  CGFloat bottom = (cropRect.origin.y + cropRect.size.height) / self.originalImage.size.height;
+  UIImage *originalRotatedImage = [self rotateImage:self.originalImage degrees:angle];
+  
+  // 保存旋转之后的原图
+  NSData *originalRotatedData = UIImagePNGRepresentation(originalRotatedImage);
+  NSString *originalRotatedFileName = [NSString stringWithFormat:@"yunti-rn-crop-original-rotated-%lf.png", now];
+  NSString *originalRotatedFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:originalRotatedFileName];
+  [originalRotatedData writeToFile:originalRotatedFilePath atomically:YES];
+  
+  CGFloat left = cropRect.origin.x / originalRotatedImage.size.width;
+  CGFloat right = (cropRect.origin.x + cropRect.size.width) / originalRotatedImage.size.width;
+  CGFloat top = cropRect.origin.y / originalRotatedImage.size.height;
+  CGFloat bottom = (cropRect.origin.y + cropRect.size.height) / originalRotatedImage.size.height;
   NSDictionary<NSString *, NSNumber *> *croppedCoordsPercent = @{
     @"left": @(left),
     @"right": @(right),
@@ -109,10 +118,12 @@ RCT_EXPORT_METHOD(cropWithUriWithAspectRatio:(NSString *)imageUrl
   };
   NSDictionary * imageData = @{
     @"uri": filePath,
+    @"originalRotatedUri": originalRotatedFilePath,
     @"croppedWidth": width,
     @"croppedHeight": height,
     @"croppedCoordsPercent": croppedCoordsPercent
   };
+  
   self._resolve(imageData);
   self.originalImage = nil;
 }
@@ -122,6 +133,39 @@ RCT_EXPORT_METHOD(cropWithUriWithAspectRatio:(NSString *)imageUrl
     [cropViewController dismissViewControllerAnimated:YES completion:nil];
   });
   self._reject(@"501", @"取消操作", [NSError errorWithDomain:@"取消操作" code:501 userInfo:NULL]);
+}
+
+/**
+ copied from https://github.com/shaojiankui/JKCategories/blob/master/JKCategories/UIKit/UIImage/UIImage%2BJKOrientation.m
+ */
+- (UIImage *)rotateImage:(UIImage *)image degrees:(CGFloat)degrees {
+  // calculate the size of the rotated view's containing box for our drawing space
+  UIView *rotatedViewBox = [[UIView alloc] initWithFrame:CGRectMake(0, 0, image.size.width, image.size.height)];
+  CGAffineTransform t = CGAffineTransformMakeRotation([self degreesToRadians:degrees]);
+  rotatedViewBox.transform = t;
+  CGSize rotatedSize = rotatedViewBox.frame.size;
+  
+  // Create the bitmap context
+  UIGraphicsBeginImageContext(rotatedSize);
+  CGContextRef bitmap = UIGraphicsGetCurrentContext();
+  
+  // Move the origin to the middle of the image so we will rotate and scale around the center.
+  CGContextTranslateCTM(bitmap, rotatedSize.width/2, rotatedSize.height/2);
+  
+  //   // Rotate the image context
+  CGContextRotateCTM(bitmap, [self degreesToRadians:degrees]);
+  
+  // Now, draw the rotated/scaled image into the context
+  CGContextScaleCTM(bitmap, 1.0, -1.0);
+  CGContextDrawImage(bitmap, CGRectMake(-image.size.width / 2, -image.size.height / 2, image.size.width, image.size.height), [image CGImage]);
+  
+  UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+  return newImage;
+}
+
+- (CGFloat)degreesToRadians:(CGFloat)degrees {
+  return degrees * M_PI / 180;
 }
 
 @end
