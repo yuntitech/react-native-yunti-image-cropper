@@ -90,7 +90,7 @@ RCT_EXPORT_METHOD(cropWithUriWithAspectRatio:(NSString *)imageUrl
     [cropViewController dismissViewControllerAnimated:YES completion:nil];
   });
   
-  NSData *jpgData = UIImageJPEGRepresentation(image, 0.95);
+  NSData *jpgData = UIImageJPEGRepresentation(image, 1);
   NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
   NSString *fileName = [NSString stringWithFormat:@"yunti-rn-crop-%lf.jpg", now];
   NSString *filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
@@ -102,7 +102,7 @@ RCT_EXPORT_METHOD(cropWithUriWithAspectRatio:(NSString *)imageUrl
   UIImage *originalRotatedImage = [self rotateImage:normalOriginalImage degrees:angle];
   
   // 保存旋转之后的原图
-  NSData *originalRotatedData = UIImageJPEGRepresentation(originalRotatedImage, 0.95);
+  NSData *originalRotatedData = UIImageJPEGRepresentation(originalRotatedImage, 1);
   NSString *originalRotatedFileName = [NSString stringWithFormat:@"yunti-rn-crop-original-rotated-%lf.jpg", now];
   NSString *originalRotatedFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:originalRotatedFileName];
   [originalRotatedData writeToFile:originalRotatedFilePath atomically:YES];
