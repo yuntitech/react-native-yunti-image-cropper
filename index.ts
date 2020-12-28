@@ -14,27 +14,30 @@ export interface CroppedCoordsPercent {
   bottom: number;
 }
 
+export interface CroppedData {
+  uri: string;
+
+  /**
+   * 旋转之后未裁剪的图片
+   *
+   * @platform iOS
+   */
+  originalRotatedUri?: string;
+
+  croppedCoordsPercent?: CroppedCoordsPercent;
+  croppedWidth?: number;
+  croppedHeight?: number;
+}
+
 class ImageCropperUtil {
   public cropWithUriWithAspectRatio = async (
     uri: string,
     param: { aspectRatioX: number; aspectRatioY: number }
-  ): Promise<{
-    uri: string;
-    croppedCoordsPercent?: CroppedCoordsPercent;
-    croppedWidth?: number;
-    croppedHeight?: number;
-  }> => {
+  ): Promise<CroppedData> => {
     return RNYuntiImageCropper.cropWithUriWithAspectRatio(uri, param);
   };
 
-  public cropWithUri = async (
-    uri: string
-  ): Promise<{
-    uri: string;
-    croppedCoordsPercent?: CroppedCoordsPercent;
-    croppedWidth?: number;
-    croppedHeight?: number;
-  }> => {
+  public cropWithUri = async (uri: string): Promise<CroppedData> => {
     return RNYuntiImageCropper.cropWithUri(uri);
   };
 }
