@@ -90,19 +90,20 @@ RCT_EXPORT_METHOD(cropWithUriWithAspectRatio:(NSString *)imageUrl
     [cropViewController dismissViewControllerAnimated:YES completion:nil];
   });
   
-  NSData *pngData = UIImagePNGRepresentation(image);
+  NSData *jpgData = UIImageJPEGRepresentation(image, 0.95);
   NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
-  NSString *fileName = [NSString stringWithFormat:@"yunti-rn-crop-%lf.png", now];
+  NSString *fileName = [NSString stringWithFormat:@"yunti-rn-crop-%lf.jpg", now];
   NSString *filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
-  [pngData writeToFile:filePath atomically:YES];
+  [jpgData writeToFile:filePath atomically:YES];
   NSNumber *width  = [NSNumber numberWithFloat:image.size.width];
   NSNumber *height = [NSNumber numberWithFloat:image.size.height];
   
-  UIImage *originalRotatedImage = [self rotateImage:self.originalImage degrees:angle];
+  UIImage *normalOriginalImage = [self normalizedImage:self.originalImage];
+  UIImage *originalRotatedImage = [self rotateImage:normalOriginalImage degrees:angle];
   
   // 保存旋转之后的原图
-  NSData *originalRotatedData = UIImagePNGRepresentation(originalRotatedImage);
-  NSString *originalRotatedFileName = [NSString stringWithFormat:@"yunti-rn-crop-original-rotated-%lf.png", now];
+  NSData *originalRotatedData = UIImageJPEGRepresentation(originalRotatedImage, 0.95);
+  NSString *originalRotatedFileName = [NSString stringWithFormat:@"yunti-rn-crop-original-rotated-%lf.jpg", now];
   NSString *originalRotatedFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:originalRotatedFileName];
   [originalRotatedData writeToFile:originalRotatedFilePath atomically:YES];
   
@@ -123,7 +124,7 @@ RCT_EXPORT_METHOD(cropWithUriWithAspectRatio:(NSString *)imageUrl
     @"croppedHeight": height,
     @"croppedCoordsPercent": croppedCoordsPercent
   };
-  
+
   self._resolve(imageData);
   self.originalImage = nil;
 }
@@ -136,12 +137,31 @@ RCT_EXPORT_METHOD(cropWithUriWithAspectRatio:(NSString *)imageUrl
 }
 
 /**
+ 修正图片方向，https://stackoverflow.com/a/24770069/1573750
+ 
+ @see 拍出来的照片永远都是right方向，https://developer.apple.com/documentation/uikit/uiimage/orientation
+ */
+- (UIImage *)normalizedImage:(UIImage *)image {
+  if (image.imageOrientation == UIImageOrientationUp) {
+    return image;
+  }
+  
+  UIGraphicsBeginImageContextWithOptions(image.size, NO, image.scale);
+  [image drawInRect:(CGRect){0, 0, image.size}];
+  UIImage *normalizedImage = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+  return normalizedImage;
+}
+
+/**
  copied from https://github.com/shaojiankui/JKCategories/blob/master/JKCategories/UIKit/UIImage/UIImage%2BJKOrientation.m
  */
 - (UIImage *)rotateImage:(UIImage *)image degrees:(CGFloat)degrees {
   // calculate the size of the rotated view's containing box for our drawing space
   UIView *rotatedViewBox = [[UIView alloc] initWithFrame:CGRectMake(0, 0, image.size.width, image.size.height)];
-  CGAffineTransform t = CGAffineTransformMakeRotation([self degreesToRadians:degrees]);
+  
+  CGFloat radians = [self degreesToRadians:degrees];
+  CGAffineTransform t = CGAffineTransformMakeRotation(radians);
   rotatedViewBox.transform = t;
   CGSize rotatedSize = rotatedViewBox.frame.size;
   
@@ -153,7 +173,7 @@ RCT_EXPORT_METHOD(cropWithUriWithAspectRatio:(NSString *)imageUrl
   CGContextTranslateCTM(bitmap, rotatedSize.width/2, rotatedSize.height/2);
   
   //   // Rotate the image context
-  CGContextRotateCTM(bitmap, [self degreesToRadians:degrees]);
+  CGContextRotateCTM(bitmap, radians);
   
   // Now, draw the rotated/scaled image into the context
   CGContextScaleCTM(bitmap, 1.0, -1.0);
