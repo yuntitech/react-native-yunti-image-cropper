@@ -1,33 +1,30 @@
 buildscript {
     repositories {
-        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
-        maven {
-            url 'https://maven.google.com'
-        }
+        google()
+        mavenCentral()
     }
 
     dependencies {
-        // Matches the RN Hello World template
-        // https://github.com/facebook/react-native/blob/1e8f3b11027fe0a7514b4fc97d0798d3c64bc895/local-cli/templates/HelloWorld/android/build.gradle#L8
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:7.3.1'
     }
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
+// Enable the new publishing mechanism
+// Set property to disable deprecated software components warning
 def safeExtGet(prop, fallback) {
     rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
 }
 
-def DEFAULT_COMPILE_SDK_VERSION = 27
-def DEFAULT_BUILD_TOOLS_VERSION = "27.0.3"
-def DEFAULT_MIN_SDK_VERSION = 16
-def DEFAULT_TARGET_SDK_VERSION = 27
+def DEFAULT_COMPILE_SDK_VERSION = 33
+def DEFAULT_MIN_SDK_VERSION = 21
+def DEFAULT_TARGET_SDK_VERSION = 33
 
 android {
   compileSdkVersion safeExtGet('compileSdkVersion', DEFAULT_COMPILE_SDK_VERSION)
-  buildToolsVersion safeExtGet('buildToolsVersion', DEFAULT_BUILD_TOOLS_VERSION)
+  // Remove buildToolsVersion to let Gradle plugin select the appropriate version
 
   defaultConfig {
     minSdkVersion safeExtGet('minSdkVersion', DEFAULT_MIN_SDK_VERSION)
@@ -42,24 +39,19 @@ android {
 }
 
 repositories {
-    maven {
-        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-        // Matches the RN Hello World template
-        // https://github.com/facebook/react-native/blob/1e8f3b11027fe0a7514b4fc97d0798d3c64bc895/local-cli/templates/HelloWorld/android/build.gradle#L21
-        url "$projectDir/../node_modules/react-native/android"
-    }
+    google()
     mavenCentral()
     maven {
-        url 'https://maven.google.com'
+        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+        url "$projectDir/../node_modules/react-native/android"
     }
-    maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
 }
 
 dependencies {
-    compile 'com.facebook.react:react-native:+'
-    compile 'com.theartofdev.edmodo:android-image-cropper:2.7.+'
-    compile 'androidx.annotation:annotation:1.1.0'
-    compile 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'com.facebook.react:react-native:+'
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.+'
+    implementation 'androidx.annotation:annotation:1.5.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
 }
 
 def configureReactNativePom(def pom) {
@@ -94,41 +86,71 @@ afterEvaluate { project ->
 
     task androidJavadoc(type: Javadoc) {
         source = android.sourceSets.main.java.srcDirs
-        classpath += files(android.bootClasspath)
-        classpath += files(project.getConfigurations().getByName('compile').asList())
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        // Don't try to access any configurations directly
+        exclude '**/BuildConfig.java'
+        exclude '**/R.java'
         include '**/*.java'
     }
 
     task androidJavadocJar(type: Jar, dependsOn: androidJavadoc) {
-        classifier = 'javadoc'
+        archiveClassifier.set('javadoc')
         from androidJavadoc.destinationDir
     }
 
     task androidSourcesJar(type: Jar) {
-        classifier = 'sources'
+        archiveClassifier.set('sources')
         from android.sourceSets.main.java.srcDirs
         include '**/*.java'
     }
 
     android.libraryVariants.all { variant ->
         def name = variant.name.capitalize()
-        task "jar${name}"(type: Jar, dependsOn: variant.javaCompile) {
-            from variant.javaCompile.destinationDir
+        // Update to use the provider API for Gradle 7+
+        task "jar${name}"(type: Jar, dependsOn: variant.javaCompileProvider) {
+            from variant.javaCompileProvider.get().destinationDirectory
         }
     }
 
-    artifacts {
-        archives androidSourcesJar
-        archives androidJavadocJar
-    }
-
-    task installArchives(type: Upload) {
-        configuration = configurations.archives
-        repositories.mavenDeployer {
-            // Deploy to react-native-event-bridge/maven, ready to publish to npm
-            repository url: "file://${projectDir}/../android/maven"
-
-            configureReactNativePom pom
+    // Replace old Upload task with modern publishing configuration
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                
+                // Include additional artifacts
+                artifact androidSourcesJar
+                artifact androidJavadocJar
+                
+                // Configure POM
+                groupId = "cn.bookln.rn.imagecropper"
+                artifactId = "react-native-yunti-image-cropper"
+                version = "1.0.0"
+                
+                // Use a safer approach for POM configuration
+                pom.withXml {
+                    def root = asNode()
+                    root.appendNode('name', 'React Native Yunti Image Cropper')
+                    root.appendNode('description', 'Image cropper for React Native')
+                    
+                    def licensesNode = root.appendNode('licenses')
+                    def licenseNode = licensesNode.appendNode('license')
+                    licenseNode.appendNode('name', 'MIT')
+                    licenseNode.appendNode('distribution', 'repo')
+                    
+                    def developersNode = root.appendNode('developers')
+                    def developerNode = developersNode.appendNode('developer')
+                    developerNode.appendNode('id', 'bookln')
+                    developerNode.appendNode('name', 'bookln')
+                }
+            }
+        }
+        
+        repositories {
+            maven {
+                // Deploy to maven directory
+                url = uri("${projectDir}/../android/maven")
+            }
         }
     }
 }
