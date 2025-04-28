@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.1'
+        // 'com.android.tools.build:gradle:7.3.1'
     }
 }
 
@@ -86,7 +86,7 @@ afterEvaluate { project ->
 
     task androidJavadoc(type: Javadoc) {
         source = android.sourceSets.main.java.srcDirs
-        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        // += project.files(android.getBootClasspath().join(File.pathSeparator))
         // Don't try to access any configurations directly
         exclude '**/BuildConfig.java'
         exclude '**/R.java'
@@ -116,7 +116,10 @@ afterEvaluate { project ->
     publishing {
         publications {
             release(MavenPublication) {
-                from components.release
+                // Reference the AAR output directly instead of using components.release
+                afterEvaluate {
+                    artifact bundleReleaseAar
+                }
                 
                 // Include additional artifacts
                 artifact androidSourcesJar
